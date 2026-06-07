@@ -12,6 +12,7 @@ import type {
   LocalClashLoginRequest,
   LocalClashMutationResponse,
   LocalClashOwnedExitImportPreviewRequest,
+  LocalClashOwnedExitImportCommitRequest,
   LocalClashOwnedExitImportPreviewResponse,
   LocalClashOwnedExitManualPreviewResponse,
   LocalClashOwnedExitPayload,
@@ -122,6 +123,15 @@ export const previewLocalClashOwnedExitImportAPI = (
 ) => {
   return localClashAPI.post<LocalClashOwnedExitImportPreviewResponse>(
     '/api/chain/owned-exits/import-preview',
+    data,
+  )
+}
+
+export const commitLocalClashOwnedExitImportAPI = (
+  data: LocalClashOwnedExitImportCommitRequest,
+) => {
+  return localClashAPI.post<LocalClashMutationResponse>(
+    '/api/chain/owned-exits/import-commit',
     data,
   )
 }

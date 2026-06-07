@@ -3,6 +3,7 @@ import { renderRoutes } from '@/helper'
 import { i18n } from '@/i18n'
 import { language } from '@/store/settings'
 import { activeBackend } from '@/store/setup'
+import ChainPage from '@/views/ChainPage.vue'
 import ConnectionsPage from '@/views/ConnectionsPage.vue'
 import HomePage from '@/views/HomePage.vue'
 import LogsPage from '@/views/LogsPage.vue'
@@ -32,14 +33,19 @@ const childrenRouter = [
     component: ConnectionsPage,
   },
   {
-    path: 'logs',
-    name: ROUTE_NAME.logs,
-    component: LogsPage,
-  },
-  {
     path: 'rules',
     name: ROUTE_NAME.rules,
     component: RulesPage,
+  },
+  {
+    path: 'chain',
+    name: ROUTE_NAME.chain,
+    component: ChainPage,
+  },
+  {
+    path: 'logs',
+    name: ROUTE_NAME.logs,
+    component: LogsPage,
   },
   {
     path: 'settings',
@@ -71,7 +77,7 @@ const router = createRouter({
 
 const title = useTitle('zashboard')
 const setTitleByName = (name: string | symbol | undefined) => {
-  if (typeof name === 'string' && activeBackend.value) {
+  if (typeof name === 'string' && (activeBackend.value || name === ROUTE_NAME.chain)) {
     title.value = `zashboard | ${i18n.global.t(name)}`
   } else {
     title.value = 'zashboard'
@@ -90,7 +96,7 @@ router.beforeEach((to, from) => {
     to.meta.transition = toIndex < fromIndex ? 'slide-right' : 'slide-left'
   }
 
-  if (!activeBackend.value && to.name !== ROUTE_NAME.setup) {
+  if (!activeBackend.value && ![ROUTE_NAME.setup, ROUTE_NAME.chain].includes(to.name as ROUTE_NAME)) {
     router.push({ name: ROUTE_NAME.setup })
   }
 })

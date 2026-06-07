@@ -103,7 +103,7 @@ import SideBar from '@/components/sidebar/SideBar.vue'
 import { dockTop } from '@/composables/paddingViews'
 import { useSettings } from '@/composables/settings'
 import { useSwipeRouter } from '@/composables/swipe'
-import { PROXY_TAB_TYPE, ROUTE_ICON_MAP, RULE_TAB_TYPE } from '@/constant'
+import { PROXY_TAB_TYPE, ROUTE_ICON_MAP, ROUTE_NAME, RULE_TAB_TYPE } from '@/constant'
 import { renderRoutes } from '@/helper'
 import { showNotification } from '@/helper/notification'
 import { getLabelFromBackend, isMiddleScreen } from '@/helper/utils'
@@ -240,6 +240,7 @@ watch(
 
 watch(documentVisible, () => {
   if (documentVisible.value !== 'visible') return
+  if (!activeBackend.value || router.currentRoute.value.name === ROUTE_NAME.chain) return
   fetchProxies()
 })
 

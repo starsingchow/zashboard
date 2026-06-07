@@ -114,6 +114,15 @@ export type LocalClashOwnedExitPayload = {
   credential?: LocalClashOwnedExitCredential
 }
 
+export type LocalClashOwnedExitImportCommitRequest = {
+  url?: string
+  yaml?: string
+  user_agent?: string
+  candidate_id: string
+  credential_ref?: string
+  exit: LocalClashOwnedExit
+}
+
 export type LocalClashOwnedExitManualPreview = {
   exit: LocalClashExitSummary | null
   warnings: LocalClashWarning[]

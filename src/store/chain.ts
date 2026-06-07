@@ -1,4 +1,5 @@
 import {
+  commitLocalClashOwnedExitImportAPI,
   fetchLocalClashChainConfigAPI,
   fetchLocalClashChainSummaryAPI,
   getLocalClashErrorMessage,
@@ -22,6 +23,7 @@ import type {
   LocalClashEntryProviderPreview,
   LocalClashEntryProviderPreviewRequest,
   LocalClashOwnedExitCandidate,
+  LocalClashOwnedExitImportCommitRequest,
   LocalClashOwnedExitImportPreviewRequest,
   LocalClashOwnedExitManualPreview,
   LocalClashOwnedExitPayload,
@@ -115,6 +117,17 @@ export const previewOwnedExitImport = async (
 
     ownedExitCandidates.value = data.candidates
     return data.candidates
+  })
+}
+
+export const commitOwnedExitImport = async (
+  payload: LocalClashOwnedExitImportCommitRequest,
+) => {
+  return runChainRequest(async () => {
+    const { data } = await commitLocalClashOwnedExitImportAPI(payload)
+
+    await loadChainConfig()
+    return data
   })
 }
 
