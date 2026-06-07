@@ -60,7 +60,6 @@
           class="select select-sm w-full"
         >
           <option value="http">http</option>
-          <option value="file">file</option>
         </select>
       </label>
       <label class="flex flex-col gap-1 text-sm md:col-span-2">
@@ -228,7 +227,7 @@ const buildPayload = (): LocalClashEntryProviderPayload => {
 
 const editProvider = (provider: LocalClashEntryProviderSummary) => {
   form.name = provider.name
-  form.type = provider.type === 'file' ? 'file' : 'http'
+  form.type = 'http'
   form.url = ''
   form.path = ''
   form.interval = 0
