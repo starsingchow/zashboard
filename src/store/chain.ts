@@ -62,13 +62,13 @@ const loadChainConfig = async () => {
     fetchLocalClashChainSummaryAPI(),
   ])
 
-  chainConfig.value = configResponse.data.config
-  chainSummary.value = summaryResponse.data.summary
+  chainConfig.value = configResponse.data.config || null
+  chainSummary.value = summaryResponse.data.summary || configResponse.data.config || null
   chainWarnings.value = [
     ...(configResponse.data.warnings || []),
-    ...(configResponse.data.config.warnings || []),
+    ...(configResponse.data.config?.warnings || []),
     ...(summaryResponse.data.warnings || []),
-    ...(summaryResponse.data.summary.warnings || []),
+    ...(summaryResponse.data.summary?.warnings || []),
   ]
 
   return {
