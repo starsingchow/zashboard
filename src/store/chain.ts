@@ -216,7 +216,7 @@ export const saveSource = async (id: string, payload: LocalClashSourcePreviewReq
     const { data } = await saveLocalClashSourceAPI(id, payload)
 
     await loadChainConfig()
-    await refreshManagedNodes()
+    await loadManagedNodes()
     return data
   })
 }
@@ -226,7 +226,7 @@ export const removeSource = async (id: string) => {
     const { data } = await removeLocalClashSourceAPI(id)
 
     await loadChainConfig()
-    await refreshManagedNodes()
+    await loadManagedNodes()
     return data
   })
 }

@@ -103,10 +103,7 @@ export type LocalClashOwnedExit = {
   health_url?: string
   exit_ip_url?: string
   expected_exit_ip?: string[]
-  extra?: Record<
-    string,
-    string | number | boolean | null | string[] | Record<string, unknown>
-  >
+  extra?: Record<string, string | number | boolean | null | string[] | Record<string, unknown>>
 }
 
 export type LocalClashOwnedExitPayload = {
@@ -225,12 +222,13 @@ export type LocalClashSourcePreviewRequest = {
 }
 
 export type LocalClashSourcePreview = {
+  source_id: string
   proxy_count: number
   proxy_group_count: number
   rule_count: number
   rule_provider_count: number
   rule_targets: string[]
-  sample_node_names: string[]
+  sample_names: string[]
   format: string
 }
 
@@ -255,10 +253,7 @@ export type LocalClashNodesResponse = LocalClashApiOk & {
   nodes: LocalClashManagedNode[]
 }
 
-export type LocalClashRuleProfileType =
-  | 'imported_source'
-  | 'shadowrocket_default'
-  | 'unmanaged'
+export type LocalClashRuleProfileType = 'imported_source' | 'shadowrocket_default' | 'unmanaged'
 
 export type LocalClashRuleProfile = {
   type: LocalClashRuleProfileType

@@ -89,7 +89,7 @@
         <button
           class="btn btn-primary btn-sm"
           type="button"
-          :disabled="!sourcePreview || loading"
+          :disabled="!canSave || loading"
           @click="save"
         >
           {{ $t('chainSave') }}
@@ -115,7 +115,7 @@ import {
   sourcePreview,
 } from '@/store/chain'
 import type { LocalClashSourcePreviewRequest } from '@/types/localclash'
-import { computed, reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 
 const sources = computed(() => chainSummary.value?.managed?.sources || [])
 const draft = reactive<LocalClashSourcePreviewRequest>({
@@ -126,13 +126,17 @@ const draft = reactive<LocalClashSourcePreviewRequest>({
 })
 
 const loading = chainLoading
+const previewKey = ref('')
+const draftKey = computed(() => JSON.stringify({ ...draft }))
+const canSave = computed(() => Boolean(sourcePreview.value) && previewKey.value === draftKey.value)
 
 const preview = async () => {
   await previewSource({ ...draft })
+  previewKey.value = draftKey.value
 }
 
 const save = async () => {
-  if (!draft.id || !draft.name || !draft.type) return
+  if (!draft.id || !draft.name || !draft.type || !canSave.value) return
   await saveSource(draft.id, { ...draft })
 }
 
