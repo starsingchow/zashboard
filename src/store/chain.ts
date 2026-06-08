@@ -2,32 +2,50 @@ import {
   commitLocalClashOwnedExitImportAPI,
   fetchLocalClashChainConfigAPI,
   fetchLocalClashChainSummaryAPI,
+  fetchLocalClashNodesAPI,
   getLocalClashErrorMessage,
   previewLocalClashEntryProviderAPI,
   previewLocalClashOwnedExitImportAPI,
   previewLocalClashOwnedExitManualAPI,
+  previewLocalClashSourceAPI,
   removeLocalClashEntryProviderAPI,
   removeLocalClashOwnedExitAPI,
   removeLocalClashRouteAPI,
+  removeLocalClashRuleOverrideAPI,
+  removeLocalClashServiceChainAPI,
+  removeLocalClashSourceAPI,
   reorderLocalClashRoutesAPI,
   runLocalClashChainActionAPI,
   saveLocalClashEntryProviderAPI,
   saveLocalClashOwnedExitAPI,
   saveLocalClashRouteAPI,
+  saveLocalClashRuleOverrideAPI,
+  saveLocalClashRuleProfileAPI,
+  saveLocalClashServiceChainAPI,
+  saveLocalClashSourceAPI,
+  updateLocalClashNodeTagsAPI,
 } from '@/api/localclash'
 import type {
   LocalClashChainAction,
   LocalClashChainActionOutput,
+  LocalClashChainActionResponse,
   LocalClashChainSummary,
   LocalClashEntryProviderPayload,
   LocalClashEntryProviderPreview,
   LocalClashEntryProviderPreviewRequest,
+  LocalClashManagedNode,
+  LocalClashNodeTag,
   LocalClashOwnedExitCandidate,
   LocalClashOwnedExitImportCommitRequest,
   LocalClashOwnedExitImportPreviewRequest,
   LocalClashOwnedExitManualPreview,
   LocalClashOwnedExitPayload,
   LocalClashRoutePayload,
+  LocalClashRuleOverride,
+  LocalClashRuleProfile,
+  LocalClashServiceChain,
+  LocalClashSourcePreview,
+  LocalClashSourcePreviewRequest,
   LocalClashWarning,
 } from '@/types/localclash'
 import { ref } from 'vue'
@@ -37,10 +55,29 @@ export const chainConfig = ref<LocalClashChainSummary | null>(null)
 export const chainWarnings = ref<LocalClashWarning[]>([])
 export const loading = ref(false)
 export const error = ref<string | null>(null)
+export const sourcePreview = ref<LocalClashSourcePreview | null>(null)
+export const managedNodes = ref<LocalClashManagedNode[]>([])
+export const activeWorkbenchTab = ref<
+  'overview' | 'sources' | 'nodes' | 'rules' | 'services' | 'preview'
+>('overview')
 export const entryProviderPreview = ref<LocalClashEntryProviderPreview | null>(null)
 export const ownedExitCandidates = ref<LocalClashOwnedExitCandidate[]>([])
 export const ownedExitManualPreview = ref<LocalClashOwnedExitManualPreview | null>(null)
 export const chainActionOutput = ref<LocalClashChainActionOutput | null>(null)
+export const chainActionStatuses = ref<
+  Record<
+    LocalClashChainAction,
+    {
+      status: 'idle' | 'running' | 'ok' | 'error'
+      message?: string
+    }
+  >
+>({
+  render: { status: 'idle' },
+  validate: { status: 'idle' },
+  test: { status: 'idle' },
+  apply: { status: 'idle' },
+})
 
 const runChainRequest = async <T>(request: () => Promise<T>) => {
   loading.value = true
@@ -78,6 +115,13 @@ const loadChainConfig = async () => {
   }
 }
 
+const loadManagedNodes = async () => {
+  const { data } = await fetchLocalClashNodesAPI()
+
+  managedNodes.value = data.nodes
+  return data.nodes
+}
+
 export const refreshChainConfig = async () => {
   return runChainRequest(loadChainConfig)
 }
@@ -109,9 +153,7 @@ export const removeEntryProvider = async (name: string) => {
   })
 }
 
-export const previewOwnedExitImport = async (
-  payload: LocalClashOwnedExitImportPreviewRequest,
-) => {
+export const previewOwnedExitImport = async (payload: LocalClashOwnedExitImportPreviewRequest) => {
   return runChainRequest(async () => {
     const { data } = await previewLocalClashOwnedExitImportAPI(payload)
 
@@ -120,9 +162,7 @@ export const previewOwnedExitImport = async (
   })
 }
 
-export const commitOwnedExitImport = async (
-  payload: LocalClashOwnedExitImportCommitRequest,
-) => {
+export const commitOwnedExitImport = async (payload: LocalClashOwnedExitImportCommitRequest) => {
   return runChainRequest(async () => {
     const { data } = await commitLocalClashOwnedExitImportAPI(payload)
 
@@ -158,6 +198,76 @@ export const removeOwnedExit = async (name: string) => {
   })
 }
 
+export const refreshManagedNodes = async () => {
+  return runChainRequest(loadManagedNodes)
+}
+
+export const previewSource = async (payload: LocalClashSourcePreviewRequest) => {
+  return runChainRequest(async () => {
+    const { data } = await previewLocalClashSourceAPI(payload)
+
+    sourcePreview.value = data.preview
+    return data.preview
+  })
+}
+
+export const saveSource = async (id: string, payload: LocalClashSourcePreviewRequest) => {
+  return runChainRequest(async () => {
+    const { data } = await saveLocalClashSourceAPI(id, payload)
+
+    await loadChainConfig()
+    await refreshManagedNodes()
+    return data
+  })
+}
+
+export const removeSource = async (id: string) => {
+  return runChainRequest(async () => {
+    const { data } = await removeLocalClashSourceAPI(id)
+
+    await loadChainConfig()
+    await refreshManagedNodes()
+    return data
+  })
+}
+
+export const updateNodeTags = async (id: string, tags: LocalClashNodeTag[]) => {
+  return runChainRequest(async () => {
+    const { data } = await updateLocalClashNodeTagsAPI(id, tags)
+
+    await loadChainConfig()
+    await loadManagedNodes()
+    return data
+  })
+}
+
+export const saveRuleProfile = async (profile: LocalClashRuleProfile) => {
+  return runChainRequest(async () => {
+    const { data } = await saveLocalClashRuleProfileAPI(profile)
+
+    await loadChainConfig()
+    return data
+  })
+}
+
+export const saveRuleOverride = async (override: LocalClashRuleOverride) => {
+  return runChainRequest(async () => {
+    const { data } = await saveLocalClashRuleOverrideAPI(override)
+
+    await loadChainConfig()
+    return data
+  })
+}
+
+export const removeRuleOverride = async (id: string) => {
+  return runChainRequest(async () => {
+    const { data } = await removeLocalClashRuleOverrideAPI(id)
+
+    await loadChainConfig()
+    return data
+  })
+}
+
 export const saveRoute = async (name: string, payload: LocalClashRoutePayload) => {
   return runChainRequest(async () => {
     const { data } = await saveLocalClashRouteAPI(name, payload)
@@ -185,22 +295,69 @@ export const reorderRoutes = async (names: string[]) => {
   })
 }
 
+export const saveServiceChain = async (service: LocalClashServiceChain) => {
+  return runChainRequest(async () => {
+    const { data } = await saveLocalClashServiceChainAPI(service)
+
+    await loadChainConfig()
+    return data
+  })
+}
+
+export const removeServiceChain = async (id: string) => {
+  return runChainRequest(async () => {
+    const { data } = await removeLocalClashServiceChainAPI(id)
+
+    await loadChainConfig()
+    return data
+  })
+}
+
 export const runChainAction = async (
   action: LocalClashChainAction,
   payload: { exit?: string } = {},
 ) => {
-  return runChainRequest(async () => {
-    const { data } = await runLocalClashChainActionAPI(action, payload)
+  chainActionStatuses.value = {
+    ...chainActionStatuses.value,
+    [action]: { status: 'running' },
+  }
 
-    chainActionOutput.value = {
-      action,
-      response: data,
+  try {
+    return await runChainRequest(async () => {
+      const { data } = await runLocalClashChainActionAPI(action, payload)
+
+      chainActionOutput.value = {
+        action,
+        response: data,
+      }
+      chainActionStatuses.value = {
+        ...chainActionStatuses.value,
+        [action]: {
+          status: data.ok ? 'ok' : 'error',
+          message: actionStatusMessage(data),
+        },
+      }
+
+      if (action === 'apply' || action === 'render') {
+        await loadChainConfig()
+      }
+
+      return chainActionOutput.value
+    })
+  } catch (err) {
+    chainActionStatuses.value = {
+      ...chainActionStatuses.value,
+      [action]: {
+        status: 'error',
+        message: getLocalClashErrorMessage(err),
+      },
     }
+    throw err
+  }
+}
 
-    if (action === 'apply' || action === 'render') {
-      await loadChainConfig()
-    }
-
-    return chainActionOutput.value
-  })
+const actionStatusMessage = (data: LocalClashChainActionResponse) => {
+  if (data.status) return data.status
+  if ('message' in data && typeof data.message === 'string') return data.message
+  return data.ok ? 'ok' : 'error'
 }

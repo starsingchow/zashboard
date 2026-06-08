@@ -24,11 +24,21 @@
     <div class="text-base-content/60 text-xs">
       {{ chainWarnings.length ? chainWarnings.join('\n') : $t('chainNoWarnings') }}
     </div>
+    <div class="grid gap-2 text-xs sm:grid-cols-4">
+      <div
+        v-for="status in actionStatuses"
+        :key="status.action"
+        class="border-base-300 rounded border p-2"
+      >
+        <div class="font-medium">{{ status.label }}</div>
+        <div class="text-base-content/70">{{ status.status }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { chainActionOutput, chainSummary, chainWarnings } from '@/store/chain'
+import { chainActionOutput, chainActionStatuses, chainSummary, chainWarnings } from '@/store/chain'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -45,6 +55,7 @@ const summaryJson = computed(() => {
     {
       mode: chainSummary.value.mode,
       runtime: chainSummary.value.runtime,
+      managed: chainSummary.value.managed,
       entry_providers: chainSummary.value.entry_providers,
       exits: chainSummary.value.exits,
       routes: chainSummary.value.routes,
@@ -53,4 +64,15 @@ const summaryJson = computed(() => {
     2,
   )
 })
+
+const actionStatuses = computed(() => [
+  { action: 'render', label: t('chainRender'), status: chainActionStatuses.value.render.status },
+  {
+    action: 'validate',
+    label: t('chainValidate'),
+    status: chainActionStatuses.value.validate.status,
+  },
+  { action: 'test', label: t('chainTest'), status: chainActionStatuses.value.test.status },
+  { action: 'apply', label: t('chainApply'), status: chainActionStatuses.value.apply.status },
+])
 </script>

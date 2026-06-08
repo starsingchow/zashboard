@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-2 text-sm">
+    <div class="grid gap-2 text-sm lg:grid-cols-6">
       <div
         v-for="stat in stats"
         :key="stat.label"
@@ -57,6 +57,7 @@
 import {
   chainSummary,
   loading as chainLoading,
+  managedNodes,
   refreshChainConfig,
   runChainAction,
 } from '@/store/chain'
@@ -74,15 +75,27 @@ import { computed } from 'vue'
 const stats = computed(() => [
   {
     label: 'chainEntryProviders',
-    value: chainSummary.value?.entry_providers.length || 0,
+    value: chainSummary.value?.entry_providers?.length || 0,
   },
   {
     label: 'chainOwnedExits',
-    value: chainSummary.value?.exits.length || 0,
+    value: chainSummary.value?.exits?.length || 0,
   },
   {
     label: 'chainRoutes',
-    value: chainSummary.value?.routes.length || 0,
+    value: chainSummary.value?.routes?.length || 0,
+  },
+  {
+    label: 'chainManagedSources',
+    value: chainSummary.value?.managed?.sources?.length || 0,
+  },
+  {
+    label: 'chainManagedNodes',
+    value: managedNodes.value.length || 0,
+  },
+  {
+    label: 'chainRuleOverrides',
+    value: chainSummary.value?.managed?.rule_overrides?.length || 0,
   },
 ])
 

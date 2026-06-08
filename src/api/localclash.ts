@@ -9,6 +9,14 @@ import type {
   LocalClashEntryProviderPayload,
   LocalClashEntryProviderPreviewRequest,
   LocalClashEntryProviderPreviewResponse,
+  LocalClashManagedNode,
+  LocalClashNodeTag,
+  LocalClashNodesResponse,
+  LocalClashRuleProfile,
+  LocalClashRuleOverride,
+  LocalClashServiceChain,
+  LocalClashSourcePreviewRequest,
+  LocalClashSourcePreviewResponse,
   LocalClashLoginRequest,
   LocalClashMutationResponse,
   LocalClashOwnedExitImportPreviewRequest,
@@ -143,6 +151,37 @@ export const previewLocalClashOwnedExitManualAPI = (data: LocalClashOwnedExitPay
   )
 }
 
+export const previewLocalClashSourceAPI = (data: LocalClashSourcePreviewRequest) => {
+  return localClashAPI.post<LocalClashSourcePreviewResponse>(
+    '/api/chain/sources/preview',
+    data,
+  )
+}
+
+export const saveLocalClashSourceAPI = (id: string, data: LocalClashSourcePreviewRequest) => {
+  return localClashAPI.put<LocalClashMutationResponse>(
+    `/api/chain/sources/${encodeURIComponent(id)}`,
+    data,
+  )
+}
+
+export const removeLocalClashSourceAPI = (id: string) => {
+  return localClashAPI.delete<LocalClashMutationResponse>(
+    `/api/chain/sources/${encodeURIComponent(id)}`,
+  )
+}
+
+export const fetchLocalClashNodesAPI = () => {
+  return localClashAPI.get<LocalClashNodesResponse>('/api/chain/nodes')
+}
+
+export const updateLocalClashNodeTagsAPI = (id: string, tags: LocalClashNodeTag[]) => {
+  return localClashAPI.patch<LocalClashMutationResponse>(
+    `/api/chain/nodes/${encodeURIComponent(id)}`,
+    { tags },
+  )
+}
+
 export const saveLocalClashOwnedExitAPI = (name: string, data: LocalClashOwnedExitPayload) => {
   return localClashAPI.put<LocalClashMutationResponse>(
     `/api/chain/owned-exits/${encodeURIComponent(name)}`,
@@ -171,6 +210,36 @@ export const removeLocalClashRouteAPI = (name: string) => {
 
 export const reorderLocalClashRoutesAPI = (names: string[]) => {
   return localClashAPI.post<LocalClashMutationResponse>('/api/chain/routes/reorder', { names })
+}
+
+export const saveLocalClashRuleProfileAPI = (profile: LocalClashRuleProfile) => {
+  return localClashAPI.put<LocalClashMutationResponse>('/api/chain/rule-profile', profile)
+}
+
+export const saveLocalClashRuleOverrideAPI = (override: LocalClashRuleOverride) => {
+  return localClashAPI.put<LocalClashMutationResponse>(
+    `/api/chain/rule-overrides/${encodeURIComponent(override.id)}`,
+    override,
+  )
+}
+
+export const removeLocalClashRuleOverrideAPI = (id: string) => {
+  return localClashAPI.delete<LocalClashMutationResponse>(
+    `/api/chain/rule-overrides/${encodeURIComponent(id)}`,
+  )
+}
+
+export const saveLocalClashServiceChainAPI = (service: LocalClashServiceChain) => {
+  return localClashAPI.put<LocalClashMutationResponse>(
+    `/api/chain/service-chains/${encodeURIComponent(service.id)}`,
+    service,
+  )
+}
+
+export const removeLocalClashServiceChainAPI = (id: string) => {
+  return localClashAPI.delete<LocalClashMutationResponse>(
+    `/api/chain/service-chains/${encodeURIComponent(id)}`,
+  )
 }
 
 export const runLocalClashChainActionAPI = (

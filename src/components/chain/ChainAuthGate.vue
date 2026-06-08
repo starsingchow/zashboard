@@ -1,5 +1,9 @@
 <template>
+  <section v-if="authenticated" class="min-h-0">
+    <slot />
+  </section>
   <form
+    v-else
     class="base-container mx-auto flex w-96 max-w-full flex-col gap-3 p-4"
     @submit.prevent="handleSubmit"
   >
@@ -52,6 +56,7 @@
 import {
   error as sessionError,
   loading as sessionLoading,
+  authenticated,
   login,
   setup,
   setupRequired,

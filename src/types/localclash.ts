@@ -183,9 +183,111 @@ export type LocalClashChainSummary = {
   entry_providers: LocalClashEntryProviderSummary[]
   exits: LocalClashExitSummary[]
   routes: LocalClashRouteSummary[]
+  managed?: {
+    sources?: LocalClashManagedSource[]
+    rule_profile?: LocalClashRuleProfile
+    node_tags?: { node_id: string; tags: LocalClashNodeTag[] }[]
+    rule_overrides?: LocalClashRuleOverride[]
+    service_chains?: LocalClashServiceChain[]
+    fixed_exit_count?: number
+    entry_eligible_hint?: number
+  }
   mode?: string
   runtime?: LocalClashChainRuntime
   warnings?: LocalClashWarning[]
+}
+
+export type LocalClashManagedSourceType =
+  | 'subscription_url'
+  | 'proxy_uri_text'
+  | 'yaml_paste'
+  | 'yaml_upload'
+
+export type LocalClashManagedSource = {
+  id: string
+  name: string
+  type: LocalClashManagedSourceType
+  url_ref?: string
+  has_url?: boolean
+  refresh_interval?: number
+  last_fetch_status?: string
+  last_parse_status?: string
+}
+
+export type LocalClashSourcePreviewRequest = {
+  id: string
+  name: string
+  type: LocalClashManagedSourceType
+  url?: string
+  text?: string
+  user_agent?: string
+  refresh_interval?: number
+}
+
+export type LocalClashSourcePreview = {
+  proxy_count: number
+  proxy_group_count: number
+  rule_count: number
+  rule_provider_count: number
+  rule_targets: string[]
+  sample_node_names: string[]
+  format: string
+}
+
+export type LocalClashSourcePreviewResponse = LocalClashApiOk & {
+  preview: LocalClashSourcePreview
+}
+
+export type LocalClashNodeTag = 'not_entry' | 'fixed_exit_candidate' | string
+
+export type LocalClashManagedNode = {
+  id: string
+  source_id: string
+  original_name: string
+  display_name: string
+  protocol?: string
+  server?: string
+  port?: number
+  tags?: LocalClashNodeTag[]
+}
+
+export type LocalClashNodesResponse = LocalClashApiOk & {
+  nodes: LocalClashManagedNode[]
+}
+
+export type LocalClashRuleProfileType =
+  | 'imported_source'
+  | 'shadowrocket_default'
+  | 'unmanaged'
+
+export type LocalClashRuleProfile = {
+  type: LocalClashRuleProfileType
+  source_id?: string
+}
+
+export type LocalClashRuleOverride = {
+  id: string
+  type: 'custom_rule' | 'disable_imported'
+  enabled: boolean
+  rule?: string
+  imported_rule_id?: string
+}
+
+export type LocalClashServiceChain = {
+  id: string
+  name: string
+  template?: string
+  enabled: boolean
+  entry_selector?: string
+  fixed_exit_node_id?: string
+  match?: {
+    domain?: string[]
+    domain_suffix?: string[]
+    domain_keyword?: string[]
+    ip_cidr?: string[]
+    geoip?: string[]
+    rule_set?: string[]
+  }
 }
 
 export type LocalClashChainSummaryResponse = LocalClashApiOk & {
@@ -211,6 +313,7 @@ export type LocalClashMutationResponse = LocalClashApiOk & {
   preview?:
     | LocalClashEntryProviderPreview
     | LocalClashOwnedExitManualPreview
+    | LocalClashSourcePreview
     | Record<string, unknown>
 }
 
