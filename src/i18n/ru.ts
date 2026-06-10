@@ -485,6 +485,20 @@ const ru: LANG_MESSAGE = {
   chainServiceName: 'Имя сервиса',
   chainTemplateRulesManaged: 'Правила управляются шаблоном',
   chainBehavior: 'Поведение',
+  chainRenderSummary: 'Сводка рендера',
+  chainProxies: 'Прокси',
+  chainGroups: 'Группы',
+  chainRuleProviders: 'Провайдеры правил',
+  chainChanges: 'Изменения',
+  chainConfigHash: 'Хэш конфигурации',
+  chainProxyCountDiff: 'Изменение кол-ва прокси',
+  chainRuleCountDiff: 'Изменение кол-ва правил',
+  chainLastGoodActive: 'Активна последняя рабочая конфигурация',
+  chainSavedAt: 'Сохранено',
+  chainServiceChainPaths: 'Пути сервисных цепочек',
+  chainRedactedYaml: 'Обезличенный YAML',
+  chainRefreshPreview: 'Обновить превью',
+
   chainRenderType: 'Тип рендера',
 
   // Smart Core

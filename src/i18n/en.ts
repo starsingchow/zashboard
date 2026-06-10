@@ -483,6 +483,20 @@ const en = {
   chainServiceName: 'Service name',
   chainTemplateRulesManaged: 'Rules managed by template',
   chainBehavior: 'Behavior',
+  chainRenderSummary: 'Render Summary',
+  chainProxies: 'Proxies',
+  chainGroups: 'Groups',
+  chainRuleProviders: 'Rule Providers',
+  chainChanges: 'Changes',
+  chainConfigHash: 'Config hash',
+  chainProxyCountDiff: 'Proxy count change',
+  chainRuleCountDiff: 'Rule count change',
+  chainLastGoodActive: 'Last known good config is active',
+  chainSavedAt: 'Saved',
+  chainServiceChainPaths: 'Service Chain Paths',
+  chainRedactedYaml: 'Redacted YAML',
+  chainRefreshPreview: 'Refresh Preview',
+
   chainRenderType: 'Render type',
 
   // Smart Core

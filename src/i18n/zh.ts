@@ -476,6 +476,20 @@ const zh: LANG_MESSAGE = {
   chainServiceName: '服务名称',
   chainTemplateRulesManaged: '规则由模板管理',
   chainBehavior: '行为',
+  chainRenderSummary: '渲染摘要',
+  chainProxies: '代理数',
+  chainGroups: '分组',
+  chainRuleProviders: '规则集',
+  chainChanges: '变更',
+  chainConfigHash: '配置哈希',
+  chainProxyCountDiff: '代理数变化',
+  chainRuleCountDiff: '规则数变化',
+  chainLastGoodActive: '当前使用上次正常配置',
+  chainSavedAt: '保存时间',
+  chainServiceChainPaths: '服务链路径',
+  chainRedactedYaml: '脱敏 YAML',
+  chainRefreshPreview: '刷新预览',
+
   chainRenderType: '渲染类型',
 
   // Smart Core

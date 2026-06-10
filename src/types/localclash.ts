@@ -386,6 +386,7 @@ export type LocalClashEnrichedPreview = {
     proxy_count_diff?: number
     rule_count_diff?: number
   }
+  warnings?: LocalClashWarning[]
 }
 
 export type LocalClashApiErrorBody = {

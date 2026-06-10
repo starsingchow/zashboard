@@ -476,6 +476,20 @@ const zhTW: LANG_MESSAGE = {
   chainServiceName: '服務名稱',
   chainTemplateRulesManaged: '規則由範本管理',
   chainBehavior: '行為',
+  chainRenderSummary: '渲染摘要',
+  chainProxies: '代理數',
+  chainGroups: '分組',
+  chainRuleProviders: '規則集',
+  chainChanges: '變更',
+  chainConfigHash: '設定雜湊',
+  chainProxyCountDiff: '代理數變化',
+  chainRuleCountDiff: '規則數變化',
+  chainLastGoodActive: '目前使用上次正常設定',
+  chainSavedAt: '儲存時間',
+  chainServiceChainPaths: '服務鏈路徑',
+  chainRedactedYaml: '脫敏 YAML',
+  chainRefreshPreview: '重新整理預覽',
+
   chainRenderType: '渲染類型',
 
   // Smart Core
