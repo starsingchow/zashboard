@@ -15,6 +15,8 @@ import {
   removeLocalClashRuleOverrideAPI,
   removeLocalClashServiceChainAPI,
   removeLocalClashSourceAPI,
+  refreshLocalClashRuleSourcesAPI,
+  refreshLocalClashSourceAPI,
   reorderLocalClashRoutesAPI,
   runLocalClashChainActionAPI,
   saveLocalClashEntryProviderAPI,
@@ -45,6 +47,7 @@ import type {
   LocalClashRuleOverride,
   LocalClashRuleProfile,
   LocalClashServiceChain,
+  LocalClashRuleSourceRefreshResponse,
   LocalClashServiceTemplate,
   LocalClashSourcePreview,
   LocalClashSourcePreviewRequest,
@@ -119,6 +122,9 @@ export const error = ref<string | null>(null)
 export const sourcePreview = ref<LocalClashSourcePreview | null>(null)
 export const managedNodes = ref<LocalClashManagedNode[]>([])
 export const serviceTemplates = ref<LocalClashServiceTemplate[]>(fallbackServiceTemplates())
+export const sourceRefreshing = ref<Record<string, boolean>>({})
+export const ruleSourceRefreshing = ref(false)
+export const ruleSourceRefreshResults = ref<LocalClashRuleSourceRefreshResponse['results']>([])
 export const activeWorkbenchTab = ref<
   'overview' | 'sources' | 'nodes' | 'rules' | 'services' | 'preview'
 >('overview')
@@ -273,6 +279,32 @@ export const refreshServiceTemplates = async () => {
     serviceTemplates.value = fallbackServiceTemplates()
   }
 }
+
+export const refreshSource = async (sourceId: string) => {
+  sourceRefreshing.value = { ...sourceRefreshing.value, [sourceId]: true }
+  try {
+    await refreshLocalClashSourceAPI(sourceId)
+    await refreshChainConfig()
+    await loadManagedNodes()
+  } catch (e) {
+    error.value = getLocalClashErrorMessage(e)
+  } finally {
+    sourceRefreshing.value = { ...sourceRefreshing.value, [sourceId]: false }
+  }
+}
+
+export const refreshRuleSources = async () => {
+  ruleSourceRefreshing.value = true
+  try {
+    const { data } = await refreshLocalClashRuleSourcesAPI()
+    ruleSourceRefreshResults.value = data.results || []
+  } catch (e) {
+    error.value = getLocalClashErrorMessage(e)
+  } finally {
+    ruleSourceRefreshing.value = false
+  }
+}
+
 export const previewSource = async (payload: LocalClashSourcePreviewRequest) => {
   return runChainRequest(async () => {
     const { data } = await previewLocalClashSourceAPI(payload)

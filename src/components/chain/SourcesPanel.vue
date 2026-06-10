@@ -20,15 +20,44 @@
               <div class="text-xs opacity-60">{{ source.id }}</div>
             </td>
             <td>{{ source.type }}</td>
-            <td>{{ source.last_parse_status || $t('chainSaved') }}</td>
+            <td>
+              <div class="flex items-center gap-1">
+                <span
+                  v-if="source.last_parse_status"
+                  class="badge badge-xs"
+                  :class="source.last_parse_status === 'ok' ? 'badge-success' : 'badge-warning'"
+                >
+                  {{ source.last_parse_status }}
+                </span>
+                <span
+                  v-else-if="source.last_fetch_status"
+                  class="badge badge-xs"
+                  :class="source.last_fetch_status === 'ok' ? 'badge-success' : 'badge-warning'"
+                >
+                  {{ source.last_fetch_status }}
+                </span>
+                <span v-else class="text-xs opacity-60">{{ $t('chainSaved') }}</span>
+              </div>
+            </td>
             <td class="text-right">
-              <button
-                class="btn btn-ghost btn-xs"
-                type="button"
-                @click="remove(source.id)"
-              >
-                {{ $t('chainDelete') }}
-              </button>
+              <div class="flex items-center justify-end gap-1">
+                <button
+                  class="btn btn-xs btn-outline"
+                  type="button"
+                  :class="{ loading: sourceRefreshing[source.id] }"
+                  :disabled="sourceRefreshing[source.id]"
+                  @click="refreshSource(source.id)"
+                >
+                  {{ $t('chainRefresh') }}
+                </button>
+                <button
+                  class="btn btn-ghost btn-xs"
+                  type="button"
+                  @click="remove(source.id)"
+                >
+                  {{ $t('chainDelete') }}
+                </button>
+              </div>
             </td>
           </tr>
           <tr v-if="sources.length === 0">
@@ -102,6 +131,38 @@
         {{ JSON.stringify(sourcePreview, null, 2) }}
       </pre>
     </form>
+
+    <div class="rounded-box border-base-300 grid gap-3 border p-3 lg:col-span-2">
+      <div class="flex items-center justify-between">
+        <h3 class="font-medium text-sm">{{ $t('chainRuleSources') }}</h3>
+        <button
+          class="btn btn-xs btn-outline"
+          type="button"
+          :class="{ loading: ruleSourceRefreshing }"
+          :disabled="ruleSourceRefreshing"
+          @click="refreshRuleSources()"
+        >
+          {{ $t('chainRefresh') }}
+        </button>
+      </div>
+      <div v-if="ruleSourceRefreshResults.length" class="space-y-1">
+        <div
+          v-for="result in ruleSourceRefreshResults"
+          :key="result.template"
+          class="flex items-center gap-2 text-sm"
+        >
+          <span class="font-medium">{{ result.template }}</span>
+          <span
+            class="badge badge-xs"
+            :class="result.status === 'ok' ? 'badge-success' : 'badge-warning'"
+          >
+            {{ result.status }}
+          </span>
+          <span v-if="result.error" class="text-error text-xs">{{ result.error }}</span>
+        </div>
+      </div>
+      <p v-else class="text-xs opacity-60">{{ $t('chainNoRuleSourceResults') }}</p>
+    </div>
   </div>
 </template>
 
@@ -110,9 +171,14 @@ import {
   chainSummary,
   loading as chainLoading,
   previewSource,
+  refreshRuleSources,
+  refreshSource,
   removeSource,
+  ruleSourceRefreshing,
+  ruleSourceRefreshResults,
   saveSource,
   sourcePreview,
+  sourceRefreshing,
 } from '@/store/chain'
 import type { LocalClashSourcePreviewRequest } from '@/types/localclash'
 import { computed, reactive, ref } from 'vue'
