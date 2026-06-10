@@ -3,6 +3,7 @@ import {
   fetchLocalClashChainConfigAPI,
   fetchLocalClashChainSummaryAPI,
   fetchLocalClashNodesAPI,
+  fetchLocalClashServiceTemplatesAPI,
   getLocalClashErrorMessage,
   previewLocalClashEntryProviderAPI,
   previewLocalClashOwnedExitImportAPI,
@@ -44,11 +45,71 @@ import type {
   LocalClashRuleOverride,
   LocalClashRuleProfile,
   LocalClashServiceChain,
+  LocalClashServiceTemplate,
   LocalClashSourcePreview,
   LocalClashSourcePreviewRequest,
   LocalClashWarning,
 } from '@/types/localclash'
 import { ref } from 'vue'
+
+const builtinServiceTemplateFallbacks: LocalClashServiceTemplate[] = [
+  {
+    id: 'openai',
+    name: 'OpenAI',
+    rule_source: 'blackmatrix7',
+    pack_name: 'openai',
+    behavior: 'domain',
+    render_type: 'RULE-SET',
+    refresh_interval: 86400,
+  },
+  {
+    id: 'claude',
+    name: 'Claude',
+    rule_source: 'blackmatrix7',
+    pack_name: 'claude',
+    behavior: 'domain',
+    render_type: 'RULE-SET',
+    refresh_interval: 86400,
+  },
+  {
+    id: 'google',
+    name: 'Google',
+    rule_source: 'blackmatrix7',
+    pack_name: 'google',
+    behavior: 'domain',
+    render_type: 'RULE-SET',
+    refresh_interval: 86400,
+  },
+  {
+    id: 'apple',
+    name: 'Apple',
+    rule_source: 'blackmatrix7',
+    pack_name: 'apple',
+    behavior: 'domain',
+    render_type: 'RULE-SET',
+    refresh_interval: 86400,
+  },
+  {
+    id: 'microsoft',
+    name: 'Microsoft',
+    rule_source: 'blackmatrix7',
+    pack_name: 'microsoft',
+    behavior: 'domain',
+    render_type: 'RULE-SET',
+    refresh_interval: 86400,
+  },
+  {
+    id: 'streaming',
+    name: 'Streaming',
+    rule_source: 'blackmatrix7',
+    pack_name: 'streaming',
+    behavior: 'domain',
+    render_type: 'RULE-SET',
+    refresh_interval: 86400,
+  },
+]
+
+const fallbackServiceTemplates = () => builtinServiceTemplateFallbacks.map((tmpl) => ({ ...tmpl }))
 
 export const chainSummary = ref<LocalClashChainSummary | null>(null)
 export const chainConfig = ref<LocalClashChainSummary | null>(null)
@@ -57,6 +118,7 @@ export const loading = ref(false)
 export const error = ref<string | null>(null)
 export const sourcePreview = ref<LocalClashSourcePreview | null>(null)
 export const managedNodes = ref<LocalClashManagedNode[]>([])
+export const serviceTemplates = ref<LocalClashServiceTemplate[]>(fallbackServiceTemplates())
 export const activeWorkbenchTab = ref<
   'overview' | 'sources' | 'nodes' | 'rules' | 'services' | 'preview'
 >('overview')
@@ -202,6 +264,15 @@ export const refreshManagedNodes = async () => {
   return runChainRequest(loadManagedNodes)
 }
 
+export const refreshServiceTemplates = async () => {
+  try {
+    const { data } = await fetchLocalClashServiceTemplatesAPI()
+    serviceTemplates.value =
+      data.templates && data.templates.length > 0 ? data.templates : fallbackServiceTemplates()
+  } catch {
+    serviceTemplates.value = fallbackServiceTemplates()
+  }
+}
 export const previewSource = async (payload: LocalClashSourcePreviewRequest) => {
   return runChainRequest(async () => {
     const { data } = await previewLocalClashSourceAPI(payload)
