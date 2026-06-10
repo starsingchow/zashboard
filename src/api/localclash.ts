@@ -6,6 +6,7 @@ import type {
   LocalClashChainConfigResponse,
   LocalClashChainSummaryResponse,
   LocalClashChainTestRequest,
+  LocalClashEnrichedPreview,
   LocalClashEntryProviderPayload,
   LocalClashEntryProviderPreviewRequest,
   LocalClashEntryProviderPreviewResponse,
@@ -14,9 +15,12 @@ import type {
   LocalClashNodesResponse,
   LocalClashRuleProfile,
   LocalClashRuleOverride,
+  LocalClashRuleSourceRefreshResponse,
   LocalClashServiceChain,
+  LocalClashServiceTemplate,
   LocalClashSourcePreviewRequest,
   LocalClashSourcePreviewResponse,
+  LocalClashSourceRefreshResponse,
   LocalClashLoginRequest,
   LocalClashMutationResponse,
   LocalClashOwnedExitImportPreviewRequest,
@@ -251,4 +255,28 @@ export const runLocalClashChainActionAPI = (
   }
 
   return localClashAPI.post<LocalClashChainActionResponse>(`/api/chain/${action}`)
+}
+
+export const refreshLocalClashSourceAPI = (sourceId: string) => {
+  return localClashAPI.post<LocalClashSourceRefreshResponse>(
+    `/api/chain/sources/${encodeURIComponent(sourceId)}/refresh`,
+  )
+}
+
+export const refreshLocalClashRuleSourcesAPI = () => {
+  return localClashAPI.post<LocalClashRuleSourceRefreshResponse>(
+    '/api/chain/rule-sources/refresh',
+  )
+}
+
+export const fetchLocalClashServiceTemplatesAPI = () => {
+  return localClashAPI.get<{ ok: boolean; templates: LocalClashServiceTemplate[] }>(
+    '/api/chain/service-templates',
+  )
+}
+
+export const fetchLocalClashEnrichedPreviewAPI = () => {
+  return localClashAPI.get<LocalClashEnrichedPreview>(
+    '/api/chain/rule-preview',
+  )
 }

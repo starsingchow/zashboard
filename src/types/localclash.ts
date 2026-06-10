@@ -332,6 +332,62 @@ export type LocalClashChainActionOutput = {
   response: LocalClashChainActionResponse
 }
 
+export type LocalClashServiceTemplate = {
+  id: string
+  name: string
+  rule_source: string
+  pack_name: string
+  behavior?: string
+  render_type?: string
+  refresh_interval?: number
+}
+
+export type LocalClashLastGoodStatus = {
+  active: boolean
+  source?: string
+  saved_at?: string
+}
+
+export type LocalClashSourceRefreshResponse = {
+  ok: boolean
+  summary?: LocalClashChainSummary
+}
+
+export type LocalClashRuleSourceRefreshResponse = {
+  ok: boolean
+  results: Array<{
+    template: string
+    status: string
+    pack?: string
+    source?: string
+    error?: string
+  }>
+}
+
+export type LocalClashEnrichedPreview = {
+  ok: boolean
+  rule_profile: LocalClashRuleProfile
+  rule_overrides: LocalClashRuleOverride[]
+  service_chains: LocalClashServiceChain[]
+  render?: {
+    proxy_count: number
+    rule_count: number
+    groups: string[]
+    rule_providers: string[]
+    redacted_yaml?: string
+  }
+  render_error?: string
+  render_error_code?: string
+  last_good?: LocalClashLastGoodStatus
+  diff?: {
+    has_current: boolean
+    current_hash?: string
+    new_hash?: string
+    proxy_count_diff?: number
+    rule_count_diff?: number
+  }
+}
+
 export type LocalClashApiErrorBody = {
   ok?: boolean
   error?: string
