@@ -3,11 +3,18 @@
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="min-w-0">
         <h1 class="truncate text-lg font-semibold">{{ $t('chainTitle') }}</h1>
-        <div class="text-base-content/60 mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs">
+        <div class="text-base-content/60 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
           <span>{{ $t('chainMode') }}: {{ chainSummary?.mode || '-' }}</span>
           <span>
             {{ $t('chainRuntime') }}:
             {{ chainSummary?.runtime?.core || '-' }}/{{ chainSummary?.runtime?.profile || '-' }}
+          </span>
+          <span
+            v-if="lastGoodStatus?.active"
+            class="badge badge-info badge-sm"
+          >
+            {{ $t('chainLastGoodActive') }}
+            <span v-if="lastGoodStatus.source">: {{ lastGoodStatus.source }}</span>
           </span>
         </div>
       </div>
@@ -28,7 +35,8 @@
           :key="action.name"
           class="btn btn-sm"
           :class="action.primary ? 'btn-primary' : 'btn-ghost'"
-          :disabled="chainLoading"
+          :disabled="isActionDisabled(action.name)"
+          :title="actionTooltip(action.name)"
           @click="handleAction(action.name)"
         >
           <component
@@ -56,6 +64,8 @@
 <script setup lang="ts">
 import {
   chainSummary,
+  lastGoodStatus,
+  chainActionStatuses,
   loading as chainLoading,
   managedNodes,
   refreshChainConfig,
@@ -69,6 +79,7 @@ import {
   PlayIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/vue/24/outline'
+import { useI18n } from 'vue-i18n'
 import type { Component } from 'vue'
 import { computed } from 'vue'
 
@@ -98,6 +109,23 @@ const stats = computed(() => [
     value: chainSummary.value?.managed?.rule_overrides?.length || 0,
   },
 ])
+
+const { t } = useI18n()
+
+const validateOk = computed(() => chainActionStatuses.value.validate.status === 'ok')
+
+const isActionDisabled = (name: LocalClashChainAction) => {
+  if (chainLoading.value) return true
+  if (name === 'apply') {
+    return !validateOk.value || chainActionStatuses.value.apply.status === 'running'
+  }
+  return false
+}
+
+const actionTooltip = (name: LocalClashChainAction) => {
+  if (name === 'apply' && !validateOk.value) return t('chainValidateBeforeApply')
+  return undefined
+}
 
 const actions: {
   name: LocalClashChainAction

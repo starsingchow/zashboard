@@ -24,6 +24,28 @@
     <div class="text-base-content/60 text-xs">
       {{ chainWarnings.length ? chainWarnings.join('\n') : $t('chainNoWarnings') }}
     </div>
+    <!-- Apply action with validation gate -->
+    <div class="flex flex-col gap-2">
+      <button
+        class="btn btn-primary btn-sm w-full sm:w-auto"
+        type="button"
+        :disabled="!validateOk || applyRunning || chainLoading"
+        @click="handleApply"
+      >
+        <span
+          v-if="applyRunning"
+          class="loading loading-spinner loading-xs"
+        />
+        {{ t('chainApply') }}
+      </button>
+      <div
+        v-if="!validateOk"
+        class="text-warning text-sm"
+      >
+        {{ t('chainValidateBeforeApply') }}
+      </div>
+    </div>
+
     <div class="grid gap-2 text-xs sm:grid-cols-4">
       <div
         v-for="status in actionStatuses"
@@ -38,7 +60,14 @@
 </template>
 
 <script setup lang="ts">
-import { chainActionOutput, chainActionStatuses, chainSummary, chainWarnings } from '@/store/chain'
+import {
+  chainActionOutput,
+  chainActionStatuses,
+  chainSummary,
+  chainWarnings,
+  loading as chainLoading,
+  runChainAction,
+} from '@/store/chain'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -75,4 +104,15 @@ const actionStatuses = computed(() => [
   { action: 'test', label: t('chainTest'), status: chainActionStatuses.value.test.status },
   { action: 'apply', label: t('chainApply'), status: chainActionStatuses.value.apply.status },
 ])
+
+const validateOk = computed(() => chainActionStatuses.value.validate.status === 'ok')
+const applyRunning = computed(() => chainActionStatuses.value.apply.status === 'running')
+
+const handleApply = async () => {
+  try {
+    await runChainAction('apply')
+  } catch {
+    // Error state is captured in store.
+  }
+}
 </script>

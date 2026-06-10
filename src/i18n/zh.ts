@@ -491,6 +491,11 @@ const zh: LANG_MESSAGE = {
   chainRefreshPreview: '刷新预览',
 
   chainRenderType: '渲染类型',
+  chainValidateBeforeApply: '请先校验配置再应用。',
+  chainDismiss: '关闭',
+  chainError: '错误',
+  chainSuggested: '建议',
+  chainLastGoodStillActive: '上一个已知正常的配置仍在生效。',
 
   // Smart Core
   RarelyUsed: '很少使用',

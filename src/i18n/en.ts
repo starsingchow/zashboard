@@ -498,6 +498,11 @@ const en = {
   chainRefreshPreview: 'Refresh Preview',
 
   chainRenderType: 'Render type',
+  chainValidateBeforeApply: 'Validate the config before applying.',
+  chainDismiss: 'Dismiss',
+  chainError: 'Error',
+  chainSuggested: 'Suggested',
+  chainLastGoodStillActive: 'Last known good config is still active.',
 
   // Smart Core
   RarelyUsed: 'Rarely used',

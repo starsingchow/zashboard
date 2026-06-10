@@ -491,6 +491,11 @@ const zhTW: LANG_MESSAGE = {
   chainRefreshPreview: '重新整理預覽',
 
   chainRenderType: '渲染類型',
+  chainValidateBeforeApply: '請先驗證配置再套用。',
+  chainDismiss: '關閉',
+  chainError: '錯誤',
+  chainSuggested: '建議',
+  chainLastGoodStillActive: '上一個已知正常的配置仍在生效。',
 
   // Smart Core
   RarelyUsed: '很少使用',

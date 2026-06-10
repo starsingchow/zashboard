@@ -2,6 +2,7 @@ import {
   commitLocalClashOwnedExitImportAPI,
   fetchLocalClashChainConfigAPI,
   fetchLocalClashChainSummaryAPI,
+  fetchLocalClashRenderedSummaryAPI,
   fetchLocalClashNodesAPI,
   fetchLocalClashServiceTemplatesAPI,
   getLocalClashErrorMessage,
@@ -51,8 +52,10 @@ import type {
   LocalClashServiceTemplate,
   LocalClashSourcePreview,
   LocalClashSourcePreviewRequest,
+  LocalClashLastGoodStatus,
   LocalClashWarning,
 } from '@/types/localclash'
+import axios from 'axios'
 import { ref } from 'vue'
 
 const builtinServiceTemplateFallbacks: LocalClashServiceTemplate[] = [
@@ -147,6 +150,21 @@ export const chainActionStatuses = ref<
   apply: { status: 'idle' },
 })
 
+export type ChainStructuredError = {
+  code?: string
+  message?: string
+  nextAction?: string
+  lastGood?: LocalClashLastGoodStatus
+}
+export const chainStructuredError = ref<ChainStructuredError | null>(null)
+
+export const dismissStructuredError = () => {
+  chainStructuredError.value = null
+  error.value = null
+}
+
+export const lastGoodStatus = ref<LocalClashLastGoodStatus | null>(null)
+
 const runChainRequest = async <T>(request: () => Promise<T>) => {
   loading.value = true
   error.value = null
@@ -162,10 +180,15 @@ const runChainRequest = async <T>(request: () => Promise<T>) => {
 }
 
 const loadChainConfig = async () => {
-  const [configResponse, summaryResponse] = await Promise.all([
+  const [configResponse, summaryResponse, renderedResponse] = await Promise.all([
     fetchLocalClashChainConfigAPI(),
     fetchLocalClashChainSummaryAPI(),
+    fetchLocalClashRenderedSummaryAPI().catch(() => null),
   ])
+
+  if (renderedResponse?.data?.last_good) {
+    lastGoodStatus.value = renderedResponse.data.last_good
+  }
 
   chainConfig.value = configResponse.data.config || null
   chainSummary.value = summaryResponse.data.summary || configResponse.data.config || null
@@ -420,6 +443,7 @@ export const runChainAction = async (
   action: LocalClashChainAction,
   payload: { exit?: string } = {},
 ) => {
+  chainStructuredError.value = null
   chainActionStatuses.value = {
     ...chainActionStatuses.value,
     [action]: { status: 'running' },
@@ -448,15 +472,29 @@ export const runChainAction = async (
       return chainActionOutput.value
     })
   } catch (err) {
+    const message = getLocalClashErrorMessage(err)
     chainActionStatuses.value = {
       ...chainActionStatuses.value,
       [action]: {
         status: 'error',
-        message: getLocalClashErrorMessage(err),
+        message,
       },
     }
+    chainStructuredError.value = extractStructuredError(err)
     throw err
   }
+}
+
+const extractStructuredError = (err: unknown): ChainStructuredError | null => {
+  if (!axios.isAxiosError(err) || !err.response?.data) return null
+  const body = err.response.data as Record<string, unknown>
+  const details = (body.details ?? {}) as Record<string, unknown>
+  const code = typeof body.error === 'string' ? body.error : undefined
+  const message = typeof body.message === 'string' ? body.message : undefined
+  const nextAction = typeof details.next_action === 'string' ? details.next_action : undefined
+  const lastGood = details.last_good as LocalClashLastGoodStatus | undefined
+  if (!code && !message && !nextAction && !lastGood) return null
+  return { code, message, nextAction, lastGood }
 }
 
 const actionStatusMessage = (data: LocalClashChainActionResponse) => {

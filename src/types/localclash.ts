@@ -298,6 +298,7 @@ export type LocalClashChainConfigResponse = {
 export type LocalClashRenderedSummary = {
   status: string
   generated: unknown
+  last_good?: LocalClashLastGoodStatus
 }
 
 export type LocalClashRenderedSummaryResponse = LocalClashApiOk & LocalClashRenderedSummary
@@ -393,4 +394,10 @@ export type LocalClashApiErrorBody = {
   ok?: boolean
   error?: string
   message?: string
+  details?: {
+    error?: string
+    last_good?: LocalClashLastGoodStatus
+    next_action?: string
+    [key: string]: unknown
+  }
 }

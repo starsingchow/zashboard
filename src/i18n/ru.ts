@@ -500,6 +500,11 @@ const ru: LANG_MESSAGE = {
   chainRefreshPreview: 'Обновить превью',
 
   chainRenderType: 'Тип рендера',
+  chainValidateBeforeApply: 'Проверьте конфигурацию перед применением.',
+  chainDismiss: 'Закрыть',
+  chainError: 'Ошибка',
+  chainSuggested: 'Рекомендация',
+  chainLastGoodStillActive: 'Последняя известная рабочая конфигурация всё ещё активна.',
 
   // Smart Core
   RarelyUsed: 'Редко используется',
