@@ -344,6 +344,7 @@ export type LocalClashServiceTemplate = {
 }
 
 export type LocalClashLastGoodStatus = {
+  config_hash?: string
   active: boolean
   source?: string
   saved_at?: string
@@ -386,6 +387,7 @@ export type LocalClashEnrichedPreview = {
     new_hash?: string
     proxy_count_diff?: number
     rule_count_diff?: number
+    diff_scope?: string
   }
   warnings?: LocalClashWarning[]
 }
