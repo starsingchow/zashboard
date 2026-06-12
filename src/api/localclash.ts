@@ -280,3 +280,31 @@ export const fetchLocalClashEnrichedPreviewAPI = () => {
     '/api/chain/rule-preview',
   )
 }
+
+export const testLocalClashNodeDelayAPI = (nodeId: string) => {
+  return localClashAPI.post<{
+    ok: boolean
+    status: string
+    latency?: number
+    message?: string
+    test?: {
+      status: string
+      proxy_name?: string
+      latency?: number
+    }
+  }>(`/api/chain/nodes/${encodeURIComponent(nodeId)}/test`)
+}
+
+export const testLocalClashServiceChainAPI = (serviceId: string) => {
+  return localClashAPI.post<{
+    ok: boolean
+    status: string
+    latency?: number
+    message?: string
+    test?: {
+      status: string
+      proxy_name?: string
+      latency?: number
+    }
+  }>(`/api/chain/service-chains/${encodeURIComponent(serviceId)}/test`)
+}

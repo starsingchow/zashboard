@@ -14,6 +14,7 @@
             <th>{{ $t('chainProtocol') }}</th>
             <th>{{ $t('chainServer') }}</th>
             <th>{{ $t('chainTags') }}</th>
+            <th>{{ $t('chainTest') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -50,10 +51,46 @@
                 {{ $t('chainFixedExitCandidate') }}
               </label>
             </td>
+            <td>
+              <div class="flex items-center gap-2">
+                <button
+                  class="btn btn-xs btn-outline"
+                  :class="{ 'btn-disabled': nodeTestResults[node.id]?.status === 'running' }"
+                  :disabled="nodeTestResults[node.id]?.status === 'running'"
+                  @click="testNodeDelay(node.id)"
+                >
+                  <span
+                    v-if="nodeTestResults[node.id]?.status === 'running'"
+                    class="loading loading-spinner loading-xs"
+                  />
+                  {{ nodeTestResults[node.id]?.status === 'running' ? $t('chainTesting') : $t('chainTest') }}
+                </button>
+                <span
+                  v-if="nodeTestResults[node.id]?.status === 'ok'"
+                  class="text-xs text-success"
+                >
+                  {{ nodeTestResults[node.id]?.message || $t('chainTestOk') }}
+                </span>
+                <span
+                  v-if="nodeTestResults[node.id]?.status === 'warn'"
+                  class="text-xs text-warning"
+                  :title="nodeTestResults[node.id]?.message"
+                >
+                  {{ nodeTestResults[node.id]?.message || $t('chainTestWarn') }}
+                </span>
+                <span
+                  v-if="nodeTestResults[node.id]?.status === 'error'"
+                  class="text-xs text-error"
+                  :title="nodeTestResults[node.id]?.message"
+                >
+                  {{ nodeTestResults[node.id]?.message || $t('chainTestFailed') }}
+                </span>
+              </div>
+            </td>
           </tr>
           <tr v-if="filteredNodes.length === 0">
             <td
-              colspan="5"
+              colspan="6"
               class="py-8 text-center opacity-60"
             >
               {{ $t('chainNoNodes') }}
@@ -66,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import { loading, managedNodes, updateNodeTags } from '@/store/chain'
+import { loading, managedNodes, nodeTestResults, testNodeDelay, updateNodeTags } from '@/store/chain'
 import type { LocalClashManagedNode, LocalClashNodeTag } from '@/types/localclash'
 import { computed, ref } from 'vue'
 

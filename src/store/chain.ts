@@ -27,6 +27,8 @@ import {
   saveLocalClashRuleProfileAPI,
   saveLocalClashServiceChainAPI,
   saveLocalClashSourceAPI,
+  testLocalClashNodeDelayAPI,
+  testLocalClashServiceChainAPI,
   updateLocalClashNodeTagsAPI,
 } from '@/api/localclash'
 import type {
@@ -164,6 +166,18 @@ export const dismissStructuredError = () => {
 }
 
 export const lastGoodStatus = ref<LocalClashLastGoodStatus | null>(null)
+
+export type NodeTestStatus = 'idle' | 'running' | 'ok' | 'warn' | 'error'
+
+export interface NodeTestResult {
+  latency?: number
+  status: NodeTestStatus
+  message?: string
+}
+
+export const nodeTestResults = ref<Record<string, NodeTestResult>>({})
+
+export const serviceChainTestResults = ref<Record<string, NodeTestResult>>({})
 
 const runChainRequest = async <T>(request: () => Promise<T>) => {
   loading.value = true
@@ -501,4 +515,42 @@ const actionStatusMessage = (data: LocalClashChainActionResponse) => {
   if (data.status) return data.status
   if ('message' in data && typeof data.message === 'string') return data.message
   return data.ok ? 'ok' : 'error'
+}
+
+export async function testNodeDelay(nodeId: string) {
+  nodeTestResults.value = { ...nodeTestResults.value, [nodeId]: { status: 'running' } }
+  try {
+    const { data } = await testLocalClashNodeDelayAPI(nodeId)
+    const status: NodeTestStatus = data.status === 'ok' ? 'ok' : data.status === 'warn' ? 'warn' : 'error'
+    const latency = data.latency
+    const message = data.message || (latency != null ? `${latency}ms` : undefined)
+    nodeTestResults.value = {
+      ...nodeTestResults.value,
+      [nodeId]: { status, latency, message },
+    }
+  } catch (e) {
+    nodeTestResults.value = {
+      ...nodeTestResults.value,
+      [nodeId]: { status: 'error', message: getLocalClashErrorMessage(e) },
+    }
+  }
+}
+
+export async function testServiceChain(serviceId: string) {
+  serviceChainTestResults.value = { ...serviceChainTestResults.value, [serviceId]: { status: 'running' } }
+  try {
+    const { data } = await testLocalClashServiceChainAPI(serviceId)
+    const status: NodeTestStatus = data.status === 'ok' ? 'ok' : data.status === 'warn' ? 'warn' : 'error'
+    const latency = data.latency
+    const message = data.message || (latency != null ? `${latency}ms` : undefined)
+    serviceChainTestResults.value = {
+      ...serviceChainTestResults.value,
+      [serviceId]: { status, latency, message },
+    }
+  } catch (e) {
+    serviceChainTestResults.value = {
+      ...serviceChainTestResults.value,
+      [serviceId]: { status: 'error', message: getLocalClashErrorMessage(e) },
+    }
+  }
 }

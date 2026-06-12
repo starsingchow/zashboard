@@ -210,6 +210,38 @@
               >
                 {{ $t('chainDelete') }}
               </button>
+              <button
+                class="btn btn-ghost btn-xs"
+                type="button"
+                :disabled="loading || !service.fixed_exit_node_id || serviceChainTestResults[service.id]?.status === 'running'"
+                @click="testServiceChain(service.id)"
+              >
+                <span
+                  v-if="serviceChainTestResults[service.id]?.status === 'running'"
+                  class="loading loading-spinner loading-xs"
+                />
+                {{ serviceChainTestResults[service.id]?.status === 'running' ? $t('chainTesting') : $t('chainTestChain') }}
+              </button>
+              <span
+                v-if="serviceChainTestResults[service.id]?.status === 'ok'"
+                class="ml-1 text-xs text-success"
+              >
+                {{ serviceChainTestResults[service.id]?.message || $t('chainTestOk') }}
+              </span>
+              <span
+                v-if="serviceChainTestResults[service.id]?.status === 'warn'"
+                class="ml-1 text-xs text-warning"
+                :title="serviceChainTestResults[service.id]?.message"
+              >
+                {{ serviceChainTestResults[service.id]?.message || $t('chainTestWarn') }}
+              </span>
+              <span
+                v-if="serviceChainTestResults[service.id]?.status === 'error'"
+                class="ml-1 text-xs text-error"
+                :title="serviceChainTestResults[service.id]?.message"
+              >
+                {{ serviceChainTestResults[service.id]?.message || $t('chainTestFailed') }}
+              </span>
             </td>
           </tr>
           <tr v-if="services.length === 0">
@@ -233,8 +265,10 @@ import {
   managedNodes,
   removeServiceChain,
   saveServiceChain,
+  serviceChainTestResults,
   serviceTemplates,
   refreshServiceTemplates,
+  testServiceChain,
 } from '@/store/chain'
 import type { LocalClashServiceChain } from '@/types/localclash'
 import { computed, onMounted, reactive, ref } from 'vue'
