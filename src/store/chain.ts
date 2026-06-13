@@ -203,6 +203,8 @@ export const refreshManagedNodes = async () => {
 }
 
 export const previewSource = async (payload: LocalClashSourcePreviewRequest) => {
+  sourcePreview.value = null
+
   return runChainRequest(async () => {
     const { data } = await previewLocalClashSourceAPI(payload)
 

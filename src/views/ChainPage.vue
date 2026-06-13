@@ -2,6 +2,7 @@
   <ChainAuthGate>
     <div class="flex h-full min-h-0 flex-col gap-4 p-4">
       <ChainStatusHeader />
+      <ChainErrorAlert />
 
       <div class="tabs tabs-boxed w-fit">
         <button
@@ -37,6 +38,7 @@
 <script setup lang="ts">
 import ChainActionPanel from '@/components/chain/ChainActionPanel.vue'
 import ChainAuthGate from '@/components/chain/ChainAuthGate.vue'
+import ChainErrorAlert from '@/components/chain/ChainErrorAlert.vue'
 import ChainStatusHeader from '@/components/chain/ChainStatusHeader.vue'
 import NodesPanel from '@/components/chain/NodesPanel.vue'
 import PreviewPanel from '@/components/chain/PreviewPanel.vue'

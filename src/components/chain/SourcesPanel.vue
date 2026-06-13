@@ -76,13 +76,17 @@
         v-else
         v-model="draft.text"
         class="textarea textarea-bordered min-h-36"
-        :placeholder="$t('chainPasteSourcePlaceholder')"
+        :placeholder="
+          draft.type === 'proxy_uri_text'
+            ? $t('chainProxyURITextPlaceholder')
+            : $t('chainPasteSourcePlaceholder')
+        "
       />
       <div class="flex justify-end gap-2">
         <button
           class="btn btn-sm"
           type="submit"
-          :disabled="loading"
+          :disabled="!canPreview || loading"
         >
           {{ $t('chainPreview') }}
         </button>
@@ -95,12 +99,81 @@
           {{ $t('chainSave') }}
         </button>
       </div>
-      <pre
-        v-if="sourcePreview"
-        class="bg-base-200 max-h-48 overflow-auto rounded p-2 text-xs"
+      <p
+        v-if="!canPreview"
+        class="text-warning text-xs"
       >
-        {{ JSON.stringify(sourcePreview, null, 2) }}
-      </pre>
+        {{ $t('chainSourceRequiredFields') }}
+      </p>
+      <p
+        v-else-if="sourceSaved"
+        class="text-success text-xs"
+      >
+        {{ $t('chainSourceSaved') }}
+      </p>
+      <p
+        v-else-if="!canSave"
+        class="text-warning text-xs"
+      >
+        {{ $t('chainPreviewRequired') }}
+      </p>
+      <p
+        v-else
+        class="text-success text-xs"
+      >
+        {{ $t('chainSourcePreviewReady') }}
+      </p>
+      <section
+        v-if="sourcePreview && canSave"
+        class="bg-base-200 rounded p-3 text-xs"
+      >
+        <div class="mb-2 flex items-center justify-between gap-2">
+          <h3 class="font-semibold">{{ $t('chainPreviewTitle') }}</h3>
+          <span class="badge badge-sm">{{ sourcePreview.format }}</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <div class="opacity-60">{{ $t('chainNodeCount') }}</div>
+            <div class="font-medium">{{ sourcePreview.proxy_count }}</div>
+          </div>
+          <div>
+            <div class="opacity-60">{{ $t('chainGroups') }}</div>
+            <div class="font-medium">{{ sourcePreview.proxy_group_count }}</div>
+          </div>
+          <div>
+            <div class="opacity-60">{{ $t('chainRules') }}</div>
+            <div class="font-medium">{{ sourcePreview.rule_count }}</div>
+          </div>
+          <div>
+            <div class="opacity-60">{{ $t('chainRuleProviders') }}</div>
+            <div class="font-medium">{{ sourcePreview.rule_provider_count }}</div>
+          </div>
+        </div>
+        <div
+          v-if="sourcePreview.rule_targets.length"
+          class="mt-3"
+        >
+          <div class="mb-1 opacity-60">{{ $t('chainRuleTargets') }}</div>
+          <div class="flex flex-wrap gap-1">
+            <span
+              v-for="target in sourcePreview.rule_targets"
+              :key="target"
+              class="badge badge-sm"
+            >
+              {{ target }}
+            </span>
+          </div>
+        </div>
+        <div
+          v-if="sourcePreview.sample_names.length"
+          class="mt-3"
+        >
+          <div class="mb-1 opacity-60">{{ $t('chainSamples') }}</div>
+          <div class="max-h-24 overflow-auto">
+            {{ sourcePreview.sample_names.join(', ') }}
+          </div>
+        </div>
+      </section>
     </form>
   </div>
 </template>
@@ -115,7 +188,7 @@ import {
   sourcePreview,
 } from '@/store/chain'
 import type { LocalClashSourcePreviewRequest } from '@/types/localclash'
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 
 const sources = computed(() => chainSummary.value?.managed?.sources || [])
 const draft = reactive<LocalClashSourcePreviewRequest>({
@@ -127,17 +200,33 @@ const draft = reactive<LocalClashSourcePreviewRequest>({
 
 const loading = chainLoading
 const previewKey = ref('')
+const sourceSaved = ref(false)
 const draftKey = computed(() => JSON.stringify({ ...draft }))
 const canSave = computed(() => Boolean(sourcePreview.value) && previewKey.value === draftKey.value)
+const hasSourceContent = computed(() =>
+  draft.type === 'subscription_url' ? Boolean(draft.url?.trim()) : Boolean(draft.text?.trim()),
+)
+const canPreview = computed(() =>
+  Boolean(draft.id.trim() && draft.name.trim() && draft.type && hasSourceContent.value),
+)
+
+watch(draftKey, () => {
+  sourceSaved.value = false
+})
 
 const preview = async () => {
+  if (!canPreview.value) return
+  previewKey.value = ''
+  sourceSaved.value = false
   await previewSource({ ...draft })
   previewKey.value = draftKey.value
 }
 
 const save = async () => {
+  sourceSaved.value = false
   if (!draft.id || !draft.name || !draft.type || !canSave.value) return
   await saveSource(draft.id, { ...draft })
+  sourceSaved.value = true
 }
 
 const remove = async (id: string) => {

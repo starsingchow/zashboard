@@ -63,7 +63,7 @@ localClashAPI.interceptors.request.use((config) => {
 
 export const getLocalClashErrorMessage = (error: unknown) => {
   if (axios.isAxiosError<LocalClashApiErrorBody>(error)) {
-    return error.response?.data?.error || error.response?.data?.message || error.message
+    return error.response?.data?.message || error.response?.data?.error || error.message
   }
 
   if (error instanceof Error) {
